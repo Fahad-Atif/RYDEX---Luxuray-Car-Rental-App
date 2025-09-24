@@ -12,19 +12,20 @@ function Navbar() {
   const navigate = useNavigate();
 
   const changeRole = async () => {
-    try {
-      const { data } = await axios.post("/api/owner/change-role"); // ✅ Added await
+  try {
+    const { data } = await axios.post("/api/owner/change-role");
 
-      if (data?.success) {
-        toast.success(data?.message);
-        setIsOwner(true);
-      } else {
-        toast.error("Please Login or Register First!");
-      }
-    } catch (error) {
-      toast.error(error.message);
+    if (data?.success) {
+      toast.success(data?.message);
+      setIsOwner(true);
+      navigate("/owner"); // ✅ Navigate after role changes
+    } else {
+      toast.error("Please Login or Register First!");
     }
-  };
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
 
   return (
     <motion.div
@@ -43,9 +44,12 @@ function Navbar() {
       </Link>
 
       <div
-        className={`max-sm:fixed max-sm:h-screen max-sm:w-full max-sm:top-16 max-sm:border-t border-borderColor right-0 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 max-sm:p-4 transition-all duration-300 z-50 ${
-          open ? "max-sm:translate-x-0" : "max-sm:translate-x-full"
-        }`}
+        className={`max-sm:fixed max-sm:h-screen max-sm:w-full max-sm:top-16
+    max-sm:border-t border-borderColor right-0 flex flex-col sm:flex-row
+    items-start sm:items-center gap-4 sm:gap-8 max-sm:p-4 transition-all
+    duration-300 z-50 max-sm:bg-white ${
+      open ? "max-sm:translate-x-0" : "max-sm:translate-x-full"
+    }`}
       >
         {menuLinks.map((val, i) => (
           <div key={val.name || i}>
