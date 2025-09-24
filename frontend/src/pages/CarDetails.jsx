@@ -4,12 +4,13 @@ import { assets } from "../assets/assets";
 import Loader from "../components/Loader";
 import { useAppContext } from "../../context/AppContext.jsx";
 import toast from "react-hot-toast";
-import { motion } from "framer-motion"; // ✅ Proper motion import
+import { motion } from "framer-motion";
 
 function CarDetails() {
   const location = useLocation();
   const { id } = useParams();
   const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const {
     cars,
@@ -43,18 +44,53 @@ function CarDetails() {
     }
   };
 
+  // Scroll to top on location change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
 
   useEffect(() => {
+    const fetchCarById = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`/api/cars/${id}`);
+        if (data.success) {
+          setCar(data.car);
+        } else {
+          toast.error("Car not found.");
+          setCar(null);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch car details.");
+        setCar(null);
+      }
+      setLoading(false);
+    };
+
     if (cars.length > 0) {
       const foundCar = cars.find((car) => car._id === id);
-      setCar(foundCar);
+      if (foundCar) {
+        setCar(foundCar);
+        setLoading(false);
+      } else {
+        fetchCarById();
+      }
+    } else {
+      // If cars list empty, fetch from backend
+      fetchCarById();
     }
-  }, [id, cars]);
+  }, [id, cars, axios]);
 
-  return car ? (
+  if (loading) return <Loader />;
+
+  if (!car)
+    return (
+      <div className="px-6 md:px-16 lg:px-24 xl:px-32 mt-16 text-center text-gray-500">
+        <p>Car not found.</p>
+      </div>
+    );
+
+  return (
     <motion.div
       className="px-6 md:px-16 lg:px-24 xl:px-32 mt-16"
       initial={{ opacity: 0, y: 30 }}
@@ -194,8 +230,6 @@ function CarDetails() {
         </motion.form>
       </div>
     </motion.div>
-  ) : (
-    <Loader />
   );
 }
 

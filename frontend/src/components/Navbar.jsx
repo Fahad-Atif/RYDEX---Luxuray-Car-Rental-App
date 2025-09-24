@@ -6,26 +6,27 @@ import toast from "react-hot-toast";
 import { motion } from "motion/react"; // ✅ Correct import
 
 function Navbar() {
-  const { setShowLogin, user, isOwner, setIsOwner, axios, logout } = useAppContext();
+  const { setShowLogin, user, isOwner, setIsOwner, axios, logout } =
+    useAppContext();
 
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const changeRole = async () => {
-  try {
-    const { data } = await axios.post("/api/owner/change-role");
+    try {
+      const { data } = await axios.post("/api/owner/change-role");
 
-    if (data?.success) {
-      toast.success(data?.message);
-      setIsOwner(true);
-      navigate("/owner"); // ✅ Navigate after role changes
-    } else {
-      toast.error("Please Login or Register First!");
+      if (data?.success) {
+        toast.success(data?.message);
+        setIsOwner(true);
+        navigate("/owner"); // ✅ Navigate after role changes
+      } else {
+        toast.error("Please Login or Register First!");
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  } catch (error) {
-    toast.error(error.message);
-  }
-};
+  };
 
   return (
     <motion.div
@@ -80,18 +81,18 @@ function Navbar() {
           </button>
 
           <button
-  onClick={() => {
-    if (user) {
-      logout();
-    } else {
-      setShowLogin(true);
-      setOpen(false); // ✅ Close mobile menu when login is triggered
-    }
-  }}
-  className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull rounded-lg text-white"
->
-  {user ? "Logout" : "Login"}
-</button>
+            onClick={() => {
+              if (user) {
+                logout();
+              } else {
+                setShowLogin(true);
+                setOpen(false); // ✅ Close mobile menu when login is triggered
+              }
+            }}
+            className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull rounded-lg text-white"
+          >
+            {user ? "Logout" : "Login"}
+          </button>
         </div>
       </div>
 
@@ -102,4 +103,4 @@ function Navbar() {
   );
 }
 
-export default Navbar; 
+export default Navbar;
