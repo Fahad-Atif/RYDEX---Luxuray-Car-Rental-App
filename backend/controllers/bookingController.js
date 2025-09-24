@@ -4,13 +4,20 @@ import Car from "../models/Owner.js";
 // Function to check car availability in the given time span
 const checkAvailability = async (carId, pickupDate, returnDate) => {
   try {
-    const booking = await Bookings.find({
+    const requestedStart = new Date(pickupDate);
+    const requestedEnd = new Date(returnDate);
+
+    const overlappingBookings = await Bookings.find({
       car: carId,
-      pickupDate: { $lte: returnDate },
-      returnDate: { $gte: pickupDate },
+      $or: [
+        {
+          pickupDate: { $lte: requestedEnd },
+          returnDate: { $gte: requestedStart },
+        },
+      ],
     });
 
-    return booking.length === 0; // Return true if car is available
+    return overlappingBookings.length === 0;
   } catch (error) {
     throw new Error("Error checking availability: " + error.message);
   }
